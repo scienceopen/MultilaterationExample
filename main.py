@@ -4,8 +4,8 @@
 #
 ############################
 
-from numpy import *
-from numpy.linalg import *
+from numpy import random,matrix,sqrt,dot,zeros,array,asarray,hypot
+from numpy.linalg import lstsq,matrix_rank,norm
 
 #speed of sound in medium
 v = 3450
@@ -20,15 +20,15 @@ sensorLocations = [ sensorRegion * ( random.random_sample(numOfDimensions)-0.5 )
 p = matrix( sensorLocations ).T
 
 #Time from emitter to each sensor
-sensorTimes = [ sqrt( dot(location-emitterLocation,location-emitterLocation) ) / v for location in sensorLocations ]
+sensorTimes = array([ sqrt( dot(location-emitterLocation,location-emitterLocation) ) / v for location in sensorLocations ])
 
-c = argmin(sensorTimes)
+c = sensorTimes.argmin()
 cTime = sensorTimes[c]
 
 #sensors delta time relative to sensor c
 t = sensorDeltaTimes = [ sensorTime - cTime for sensorTime in sensorTimes ]
 
-ijs = range(nSensors)
+ijs = list(range(nSensors))
 del ijs[c]
 
 A = zeros([nSensors-1,numOfDimensions])
@@ -50,5 +50,5 @@ for i in ijs:
 
 calculatedLocation = asarray( lstsq(A,b)[0] )[:,0]
 
-print "Emitter location: %s " % emitterLocation
-print "Calculated position of emitter: %s " % calculatedLocation
+print("Emitter location: {} ".format(emitterLocation))
+print("estimation error: {:.3e} m".format(norm(emitterLocation-calculatedLocation)))
